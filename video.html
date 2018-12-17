@@ -1,0 +1,41 @@
+<html>
+  <head>
+  </head>
+  <body>
+
+    <div class="clear">&nbsp;</div>
+
+    <script type="text/javascript" src="https://content.jwplatform.com/libraries/cZmbbitR.js"></script>
+    <script type="text/javascript">jwplayer.key="G0B8R5AdgcG4dDf/LO4iNtrpGX00TKVEPWTqstdibpY="</script>
+
+    <div id="bp-video-player">Media is loading</div>
+
+    <script>
+      var video_file_url = "./sew.MOV";
+      var video_title = "fake video title";
+      var video_first_image = "./sew.jpg";
+        jwplayer("bp-video-player").setup({
+            "playlist": [{
+                "sources": [
+                    {
+                      file: video_file_url,
+                      "default": 'true'
+                    }
+                    ],
+                "title": video_title,
+                "image": video_first_image,
+                "tracks": []
+                }],
+            "startparam": '0',
+            "rtmp": {
+                bufferlength: '0.1'
+            },
+            "ga": {},
+            "width": '480',
+        });
+        jwplayer("bp-video-player").on('time', function(result) {
+          console.log(result);
+        });
+    </script>
+  </body>
+</html>
