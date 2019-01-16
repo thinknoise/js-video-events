@@ -2,6 +2,7 @@
 // BEPRESS_SW_HOST
 const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
 let page_uri = encodeURI(window.location.href);
+
 function display_video_player(element, video_file_url, video_image_url, video_title) {
   let latestPos = 0;
   let fifty_sent = false;
@@ -47,7 +48,7 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
 
   function pauseEventListener (result) {
     bs_dashboard_request(page_uri, "pause");
-    // console.log("pause", result);
+    console.log("pause", result);
   }
 
   function timeEventListener (result) {
