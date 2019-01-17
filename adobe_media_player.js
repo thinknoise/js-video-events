@@ -5,7 +5,7 @@ function trackEventHandler(e) {
 
 var pageData = {
     page: {
-        environment: 'staging',
+        environment: 'prod',
         name: 'BEPRESS_MEDIA_PLAYER',
     }
 };
