@@ -41,26 +41,15 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
     request.send();
   }
 
-  function bs_adobe_request(uri, e) {
-    var url = "https://adobeanalytics" + uri + "&event=" + e;
-    var request = new XMLHttpRequest();
-    // request.addEventListener("load", response);
-    // request.open("GET", url, response);
-    // request.send();
-
-  }
-
   function playEventListener (result) {
     let event = latestPos === 0 ? "start" : "play";
     bs_dashboard_request(page_uri, event);
-    bs_adobe_request(adobe_uri, event);
-    // console.log("play", result, latestPos);
+    console.log("play", result, latestPos);
   }
 
   function pauseEventListener (result) {
     bs_dashboard_request(page_uri, "pause");
-    bs_adobe_request(adobe_uri, event);
-    // console.log("pause", result);
+    console.log("pause", result);
   }
 
   function timeEventListener (result) {
