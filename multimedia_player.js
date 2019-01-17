@@ -2,6 +2,7 @@
 // BEPRESS_SW_HOST
 const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
 let page_uri = encodeURI(window.location.href);
+
 function display_video_player(element, video_file_url, video_image_url, video_title) {
   const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
   let latestPos = 0;
