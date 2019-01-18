@@ -5,14 +5,14 @@ function trackEventHandler(e) {
 
 var pageData = {
     page: {
-        environment: 'prod',
-        name: 'BEPRESS_MEDIA_PLAYER',
+        environment: 'elsevier-bpeg-dev',
+        name: 'bpeg:media-player',
     }
 };
 
 
 function AdobeEventListener(result) {
-  pageDataTracker.trackEvent(result.type, pageData, trackEventHandler)
+  AaCall(result.type);
 }
 
 var fifty_sent = false;
@@ -23,20 +23,24 @@ function timeEventListenerAdobe(result) {
   latestPos = result.position;
   if (percentage > .5) {
     if (!fifty_sent) {
-      pageDataTracker.trackEvent("50_pct", pageData, trackEventHandler)
+      pageDataTracker.trackEvent("50_pct", pageData)
       //console.log("send 50% seen", result);
       fifty_sent = true;
     }
   }
   if (result.position > 30) {
     if (!thirty_sent) {
-      pageDataTracker.trackEvent("30_sec", pageData, trackEventHandler)
+      pageDataTracker.trackEvent("30_sec", pageData)
       thirty_sent = true;
     }
   }
   if (percentage === 1) {
-    pageDataTracker.trackEvent("media complete", pageData, trackEventHandler)
+    pageDataTracker.trackEvent("media complete", pageData)
   }
+}
+
+function AaCall (eventString) {
+  pageDataTracker.trackEvent(eventString, pageData)
 }
 
 jwplayer('bp-video-player').on('play', AdobeEventListener);

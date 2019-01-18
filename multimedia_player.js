@@ -73,12 +73,11 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
       bs_dashboard_request(page_uri, "complete");
       console.log("video complete");
     }
-    bs_adobe_request(adobe_uri, event);
   }
 
-  jwplayer("hosted-streaming").on('play', playEventListener);
-  jwplayer("hosted-streaming").on('pause', pauseEventListener);
-  jwplayer("hosted-streaming").on('time', timeEventListener);
+  jwplayer(element).on('play', playEventListener);
+  jwplayer(element).on('pause', pauseEventListener);
+  jwplayer(element).on('time', timeEventListener);
 }
 
 // the video url, image url and title come from html page that has the element
