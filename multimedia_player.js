@@ -3,7 +3,7 @@
 const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
 let page_uri = encodeURI(window.location.href);
 
-function display_video_player(element, video_file_url, video_image_url, video_title) {
+function display_video_player(element, video_file_url, video_image_url, video_title, adobe_analytics_request) {
   const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
   let latestPos = 0;
   let fifty_sent = false;
@@ -39,6 +39,7 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
     request.addEventListener("load", response);
     request.open("GET", url, response);
     request.send();
+    adobe_analytics_request(event);
   }
 
   function playEventListener (result) {
@@ -80,6 +81,17 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
   jwplayer(element).on('time', timeEventListener);
 }
 
+var pageData = {
+    page: {
+        environment: 'elsevier-bpeg-dev',
+        name: 'bpeg:media-player',
+    }
+};
+
+function AdobeEventRequest (eventString) {
+  pageDataTracker.trackEvent(eventString, pageData)
+}
+
 // the video url, image url and title come from html page that has the element
 // which is described in the first param
-display_video_player("bp-video-player", bp_video_source_url, bp_video_image_url, bp_video_title);
+display_video_player("bp-video-player", bp_video_source_url, bp_video_image_url, bp_video_title, this.AdobeEventRequest);
