@@ -3,9 +3,11 @@
 const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
 let page_uri = encodeURI(window.location.href);
 
-function display_video_player(element, video_file_url, video_image_url, video_title, adobe_analytics_request) {
+function display_video_player(element, streamingEndpoint, video_image_url, video_title) {
   const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
   let latestPos = 0;
+  var mediaDuration = 0;
+  let start_sent = false;
   let fifty_sent = false;
   let thirty_sent =false;
 
@@ -13,7 +15,7 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
       "playlist": [{
           "sources": [
               {
-                file: video_file_url,
+                file: streamingEndpoint,
                 "default": 'true'
               }
               ],
@@ -33,24 +35,30 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
     console.log(res);
   }
 
-  function bs_dashboard_request (article_uri, event) {
-    var url = "https://" + BEPRESS_SW_HOST + "/do/tracking-stream/?article_uri=" + article_uri + "&event=" + event;
+  function adobe_analytics_request (event) {
+    pageDataTracker.trackEvent(event, {
+      video: {
+        'id': streamingEndpoint, // e.g. name of the video
+        'length': mediaDuration, // e.g. 37 seconds
+        'position': latestPos // current position in video, e.g. 5 seconds
+      }
+    });
+  }
+
+  function bs_dashboard_request (event) {
+    var url = "https://" + BEPRESS_SW_HOST + "/do/tracking-stream/?article_uri=" + streamingEndpoint + "&event=" + event;
     var request = new XMLHttpRequest();
     request.addEventListener("load", response);
     request.open("GET", url, response);
     request.send();
-    adobe_analytics_request(event);
   }
 
-  function playEventListener (result) {
-    let event = latestPos === 0 ? "start" : "play";
-    bs_dashboard_request(page_uri, event);
-    console.log("play", result, latestPos);
-  }
-
-  function pauseEventListener (result) {
-    bs_dashboard_request(page_uri, "pause");
-    console.log("pause", result);
+  function startEventListener (result) {
+    if (!start_sent) {
+        bs_dashboard_request("start");
+        adobe_analytics_request("videoStart");
+        start_sent = true;
+    }
   }
 
   function timeEventListener (result) {
@@ -58,25 +66,28 @@ function display_video_player(element, video_file_url, video_image_url, video_ti
     latestPos = result.position;
     if (percentage > .5) {
       if (!fifty_sent) {
-        bs_dashboard_request(page_uri, "50_pct");
-        console.log("send 50% seen", result);
+        bs_dashboard_request("50_pct");
         fifty_sent = true;
       }
     }
     if (result.position > 30) {
       if (!thirty_sent) {
-        bs_dashboard_request(page_uri, "30_sec");
-        console.log("send 30sec seen", result);
+        bs_dashboard_request("30_sec");
         thirty_sent = true;
       }
     }
     if (percentage === 1) {
-      bs_dashboard_request(page_uri, "complete");
-      console.log("video complete");
+      bs_dashboard_request("complete");
+      adobe_analytics_request(page_uri, "videoComplete");
     }
   }
 
-  jwplayer(element).on('play', playEventListener);
+  function pauseEventListener (result) {
+    bs_dashboard_request(page_uri, "pause");
+    adobe_analytics_request("videoStop");
+  }
+
+  jwplayer(element).on('play', startEventListener);
   jwplayer(element).on('pause', pauseEventListener);
   jwplayer(element).on('time', timeEventListener);
 }
@@ -88,10 +99,6 @@ var pageData = {
     }
 };
 
-function AdobeEventRequest (eventString) {
-  pageDataTracker.trackEvent(eventString, pageData)
-}
-
 // the video url, image url and title come from html page that has the element
 // which is described in the first param
-display_video_player("bp-video-player", bp_video_source_url, bp_video_image_url, bp_video_title, this.AdobeEventRequest);
+display_video_player("bp-video-player", streamingEndpoint, bp_video_image_url, bp_video_title);
