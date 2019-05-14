@@ -61,6 +61,7 @@ function display_video_player(element, streamingEndpoint, video_image_url, video
   }
 
   function startEventListener (result) {
+    console.log(result);
     if (start_sent) {
       adobe_analytics_request("videoPlay");
     }
@@ -72,8 +73,8 @@ function display_video_player(element, streamingEndpoint, video_image_url, video
 
   function timeEventListener (result) {
     var percentage = result.position/result.duration;
-    mediaDuration = result.duration;
-    latestPos = result.position;
+    mediaDuration = Math.round(result.duration * 100)/100;
+    latestPos = Math.round(result.position * 100)/100;
     if (!start_sent) {
         bs_dashboard_request("start");
         start_sent = true;
@@ -83,7 +84,7 @@ function display_video_player(element, streamingEndpoint, video_image_url, video
       if (!fifty_sent) {
         bs_dashboard_request("50_pct");
         fifty_sent = true;
-        adobe_analytics_request("event106");
+        adobe_analytics_request("50_pct");
       }
     }
     if (result.position > 30) {
