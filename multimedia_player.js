@@ -5,6 +5,7 @@ let page_uri = encodeURI(window.location.href);
 
 function display_video_player(element, streamingEndpoint, video_image_url, video_title) {
   const BEPRESS_SW_HOST = "blues.qa1.bdev.us";
+  var pageURI = document.location.protocol + '//' + document.location.hostname + document.location.pathname;
   let latestPos = 0;
   var mediaDuration = 0;
   let start_sent = false;
@@ -35,14 +36,20 @@ function display_video_player(element, streamingEndpoint, video_image_url, video
     console.log(res);
   }
 
+  function adobe_analytics_callback (result) {
+    console.log("AA calback", result);
+  }
+
   function adobe_analytics_request (event) {
-    pageDataTracker.trackEvent(event, {
+    videoData = {
       video: {
-        'id': streamingEndpoint, // e.g. name of the video
-        'length': mediaDuration, // e.g. 37 seconds
-        'position': latestPos // current position in video, e.g. 5 seconds
+        'id': encodeURIComponent(pageURI),
+        'length': mediaDuration,
+        'position': latestPos
       }
-    });
+    };
+    console.log("[AA]", pageURI, event, videoData);
+    pageDataTracker.trackEvent(event, videoData);
   }
 
   function bs_dashboard_request (event) {
@@ -54,20 +61,29 @@ function display_video_player(element, streamingEndpoint, video_image_url, video
   }
 
   function startEventListener (result) {
-    if (!start_sent) {
-        bs_dashboard_request("start");
-        adobe_analytics_request("videoStart");
-        start_sent = true;
+    if (start_sent) {
+      adobe_analytics_request("videoPlay");
     }
+  }
+
+  function pauseEventListener (result) {
+    adobe_analytics_request("videoStop");
   }
 
   function timeEventListener (result) {
     var percentage = result.position/result.duration;
+    mediaDuration = result.duration;
     latestPos = result.position;
+    if (!start_sent) {
+        bs_dashboard_request("start");
+        start_sent = true;
+        adobe_analytics_request("videoStart");
+    }
     if (percentage > .5) {
       if (!fifty_sent) {
         bs_dashboard_request("50_pct");
         fifty_sent = true;
+        adobe_analytics_request("event106");
       }
     }
     if (result.position > 30) {
@@ -78,13 +94,8 @@ function display_video_player(element, streamingEndpoint, video_image_url, video
     }
     if (percentage === 1) {
       bs_dashboard_request("complete");
-      adobe_analytics_request(page_uri, "videoComplete");
+      adobe_analytics_request("videoComplete");
     }
-  }
-
-  function pauseEventListener (result) {
-    bs_dashboard_request(page_uri, "pause");
-    adobe_analytics_request("videoStop");
   }
 
   jwplayer(element).on('play', startEventListener);

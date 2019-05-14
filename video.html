@@ -9,15 +9,39 @@
     <script type="text/javascript">jwplayer.key="G0B8R5AdgcG4dDf/LO4iNtrpGX00TKVEPWTqstdibpY="</script>
 
     <p>html5 player</p>
-    <video width="480" controls>
+    <video
+      width="480"
+      height="320"
+      controls poster="sew.jpg"
+      onplay="onplayHandler(event)"
+      onpause="onplayHandler(event)"
+      onended="onplayHandler(event)"
+      ontimeupdate="ontimeupdateHandler(event)"
+      >
       <source src="sew.MOV" type="video/mp4">
       Your browser does not support the video tag.
     </video>
+    <script>
+      function onplayHandler(event) {
+        console.log(event);
+      }
+      function ontimeupdateHandler(event) {
+        console.log(event.target.currentTime);
+      }
+    </script>
+
+    <!-- just for comparison -->
     <p>
     <p>jw player</p>
     <div id="bp-video-player">Media is loading</div>
 
     <script>
+    function onplayHandler(event) {
+      console.log(event);
+    }
+    function ontimeupdateHandler(event) {
+      console.log(event.target.currentTime);
+    }
       var video_file_url = "./sew.MOV";
       var video_title = "fake video title";
       var video_first_image = "./sew.jpg";
